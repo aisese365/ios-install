@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "build": "npm run build:github",
+    "build:github": "DOMAIN=aisese365.github.io DOWNLOAD_URL_PREFIX=https://github.com/aisese365/aisese365.github.io/releases/download/v1.10.4/ node scripts/build.mjs",
+    "build:cf": "DOMAIN=aisese365.pages.dev DOWNLOAD_URL_PREFIX=https://pub-9f9a433bef504b16b1b30cd09cc00b91.r2.dev/ node scripts/build.mjs"
+  }
+}

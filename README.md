@@ -5,22 +5,75 @@
 ## 文件
 
 - `index.html`：用户访问的安装页，会自动生成 `itms-services://` 安装链接。
-- `manifest.plist`：iOS 安装描述文件模板。
-- `purrly.ipa`：需要你自己放入目录或对象存储的 IPA 文件。
-- `icon-57.png`、`icon-512.png`：需要你自己替换的展示图标。
+- `app.config.json`：App 名称、版本号、Bundle Identifier、IPA 文件名模板等构建配置。
+- `scripts/build.mjs`：构建脚本，会生成带 hash 的 iOS 安装描述文件。
+- `dist/`：运行构建后生成的静态部署目录。
+- `logo.png`、favicon 等图片：安装页使用的静态资源。
 
-## 部署前替换
+## 构建
 
-打开 `manifest.plist`，替换下面几项：
+先在 `app.config.json` 中配置版本号等信息：
 
-- `https://example.com/purrly.ipa`：改成真实 IPA 的 HTTPS 地址。
-- `https://example.com/icon-57.png`：改成 57x57 图标 HTTPS 地址。
-- `https://example.com/icon-512.png`：改成 512x512 图标 HTTPS 地址。
-- `com.yourcompany.purrly`：改成 App 的真实 Bundle Identifier。
-- `1.0.0`：改成当前版本号。
-- `PurrlyAI`：展示给用户的 App 名称。
+```json
+{
+  "appName": "AI妄想",
+  "bundleIdentifier": "ai.purrly.app",
+  "version": "1.10.5",
+  "ipaFile": "aisese-ios-{version}.ipa",
+  "logoPath": "logo.png"
+}
+```
 
-安装页当前固定使用 `https://ios-install.purrly.ai/manifest.plist` 作为描述文件地址。
+构建时可以通过环境变量指定远程资源前缀：
+
+```sh
+npm run build:github
+npm run build:cf
+```
+
+- `DOMAIN`：安装页域名或 HTTPS 前缀，会用于生成指向 `https://DOMAIN/ios-install` 的 `qrcode.png`，也会和 `logoPath` 拼成 manifest 中的图标地址。
+- `DOWNLOAD_URL_PREFIX`：IPA 下载地址前缀，会和 `ipaFile` 拼成安装包地址。
+- `ipaFile` 支持 `{version}` 占位符，会替换为 `app.config.json` 里的版本号。
+
+当前 `package.json` 中的脚本为：
+
+```json
+{
+  "scripts": {
+    "build": "npm run build:github",
+    "build:github": "DOMAIN=aisese365.github.io DOWNLOAD_URL_PREFIX=https://github.com/aisese365/aisese365.github.io/releases/download/v1.10.4/ node scripts/build.mjs",
+    "build:cf": "DOMAIN=aisese365.pages.dev DOWNLOAD_URL_PREFIX=https://pub-9f9a433bef504b16b1b30cd09cc00b91.r2.dev/ node scripts/build.mjs"
+  }
+}
+```
+
+未设置环境变量时，构建脚本默认使用：
+
+```text
+DOMAIN=https://aisese.ai
+DOWNLOAD_URL_PREFIX=https://download.aisese.ai
+```
+
+构建完成后会生成：
+
+```text
+dist/index.html
+dist/manifest.<hash>.plist
+```
+
+`dist/index.html` 会引用带 hash 的 manifest 文件名，例如 `manifest.abc123def456.plist`，避免 iOS 或 CDN 缓存旧的安装描述文件。部署时将 `dist/` 作为静态站点目录。
+
+## GitHub Pages
+
+仓库已包含 GitHub Actions 工作流：`.github/workflows/pages.yml`。
+
+推送到 `main` 分支或在 Actions 页面手动触发 `Deploy GitHub Pages` 后，工作流会运行：
+
+```sh
+npm run build:github
+```
+
+然后将 `dist/` 发布到 GitHub Pages。首次使用时，需要在 GitHub 仓库设置中打开 Pages，并将 Source 设为 `GitHub Actions`。
 
 Cloudflare Pages 部署后，`/ios-install` 会通过 `_redirects` 重写到根目录的安装页。
 

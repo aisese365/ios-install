@@ -1,0 +1,7 @@
+{
+  "appName": "AI妄想",
+  "bundleIdentifier": "ai.purrly.app",
+  "version": "1.10.5",
+  "ipaFile": "aisese-ios-{version}.ipa",
+  "logoPath": "logo.png"
+}
