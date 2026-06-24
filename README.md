@@ -19,7 +19,6 @@
   "appName": "AI妄想",
   "bundleIdentifier": "ai.purrly.app",
   "version": "1.10.5",
-  "ipaFile": "aisese-ios-{version}.ipa",
   "logoPath": "logo.png"
 }
 ```
@@ -31,9 +30,9 @@ npm run build:github
 npm run build:cf
 ```
 
-- `DOMAIN`：安装页域名或 HTTPS 前缀，会用于生成指向 `https://DOMAIN/ios-install` 的 `qrcode.png`，也会和 `logoPath` 拼成 manifest 中的图标地址。
-- `DOWNLOAD_URL_PREFIX`：IPA 下载地址前缀，会和 `ipaFile` 拼成安装包地址。
-- `ipaFile` 支持 `{version}` 占位符，会替换为 `app.config.json` 里的版本号。
+- `DOMAIN`：二维码内容，支持填写完整 HTTPS 地址；未写协议时会自动补成 HTTPS。manifest 中的图标地址会使用 `DOMAIN` 加 `logoPath`，例如 `DOMAIN=https://example.com/ios-install/` 时会生成 `https://example.com/ios-install/logo.png`。
+- `DOWNLOAD_URL`：IPA 完整下载地址模板。
+- `DOWNLOAD_URL` 支持 `{version}` 占位符，会替换为 `app.config.json` 里的版本号。
 
 当前 `package.json` 中的脚本为：
 
@@ -41,8 +40,8 @@ npm run build:cf
 {
   "scripts": {
     "build": "npm run build:github",
-    "build:github": "DOMAIN=aisese365.github.io DOWNLOAD_URL_PREFIX=https://github.com/aisese365/aisese365.github.io/releases/download/v1.10.4/ node scripts/build.mjs",
-    "build:cf": "DOMAIN=aisese365.pages.dev DOWNLOAD_URL_PREFIX=https://pub-9f9a433bef504b16b1b30cd09cc00b91.r2.dev/ node scripts/build.mjs"
+    "build:github": "DOMAIN=https://aisese365.github.io/ios-install/ DOWNLOAD_URL=https://github.com/aisese365/aisese365.github.io/releases/download/v{version}/aisese-ios-{version}.ipa node scripts/build.mjs",
+    "build:cf": "DOMAIN=https://aisese365-ios-install.pages.dev/ DOWNLOAD_URL=https://pub-9f9a433bef504b16b1b30cd09cc00b91.r2.dev/aisese-ios-{version}.ipa node scripts/build.mjs"
   }
 }
 ```
@@ -51,7 +50,7 @@ npm run build:cf
 
 ```text
 DOMAIN=https://aisese.ai
-DOWNLOAD_URL_PREFIX=https://download.aisese.ai
+DOWNLOAD_URL=https://download.aisese.ai/aisese-ios-{version}.ipa
 ```
 
 构建完成后会生成：
@@ -75,7 +74,23 @@ npm run build:github
 
 然后将 `dist/` 发布到 GitHub Pages。首次使用时，需要在 GitHub 仓库设置中打开 Pages，并将 Source 设为 `GitHub Actions`。
 
-Cloudflare Pages 部署后，`/ios-install` 会通过 `_redirects` 重写到根目录的安装页。
+## Cloudflare
+
+Cloudflare Workers 静态资源部署使用 `wrangler.toml`：
+
+```toml
+[assets]
+directory = "./dist"
+```
+
+这样 Cloudflare 只会上传构建后的 `dist/`，不会把仓库根目录或 `node_modules/` 当成静态资源上传。
+
+如果使用 Cloudflare Pages 面板部署，请配置：
+
+```text
+Build command: npm run build:cf
+Build output directory: dist
+```
 
 页面支持通过 `lang` 参数切换语言：`zh` 为简体中文，`zh_Hant` 为繁体中文（台湾），`en` 为英文，`jp` 为日文。未提供参数时会根据浏览器语言自动选择。
 

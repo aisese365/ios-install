@@ -1,0 +1,5 @@
+name = "ios-enterprise-install-page"
+compatibility_date = "2026-06-24"
+
+[assets]
+directory = "./dist"

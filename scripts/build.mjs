@@ -26,18 +26,18 @@ const config = JSON.parse(await fs.readFile(configPath, "utf8"));
 const appName = requireString(config.appName, "appName");
 const bundleIdentifier = requireString(config.bundleIdentifier, "bundleIdentifier");
 const appVersion = requireString(config.version, "version");
-const ipaFile = requireString(config.ipaFile, "ipaFile");
 const logoPath = requireString(config.logoPath, "logoPath");
 
-const domain = normalizeHttpsBase(process.env.DOMAIN || "https://aisese.ai", "DOMAIN");
-const downloadUrlPrefix = normalizeHttpsBase(
-  process.env.DOWNLOAD_URL_PREFIX || "https://download.aisese.ai",
-  "DOWNLOAD_URL_PREFIX"
+const domain = normalizeHttpsUrl(process.env.DOMAIN || "https://aisese.ai", "DOMAIN");
+const downloadUrl = normalizeHttpsUrl(
+  formatTemplate(process.env.DOWNLOAD_URL || "https://download.aisese.ai/aisese-ios-{version}.ipa"),
+  "DOWNLOAD_URL"
 );
 
-const ipaUrl = joinUrl(downloadUrlPrefix, formatTemplate(ipaFile));
-const logoUrl = joinUrl(domain, formatTemplate(logoPath));
-const qrCodeUrl = joinUrl(domain, "ios-install");
+const ipaUrl = downloadUrl;
+const formattedLogoPath = formatTemplate(logoPath);
+const logoUrl = joinUrl(domain, formattedLogoPath);
+const qrCodeUrl = domain;
 const plist = createManifestPlist({
   appName,
   appVersion,
@@ -52,7 +52,7 @@ await fs.rm(distDir, { recursive: true, force: true });
 await fs.mkdir(distDir, { recursive: true });
 
 await Promise.all(staticFiles.map(copyStaticFile));
-await fs.writeFile(path.join(distDir, "qrcode.png"), createQrCodePng(qrCodeUrl));
+await fs.writeFile(path.join(distDir, "qrcode.png"), createQrCodePng(qrCodeUrl, { borderModules: 2 }));
 await fs.writeFile(path.join(distDir, manifestFileName), plist);
 await fs.writeFile(path.join(distDir, "index.html"), await createIndexHtml(manifestFileName));
 
@@ -74,7 +74,7 @@ async function copyStaticFile(fileName) {
   }
 }
 
-async function createIndexHtml(manifestFileName) {
+async function createIndexHtml(manifestFileName, assetPrefix = "") {
   const indexPath = path.join(rootDir, "index.html");
   const source = await fs.readFile(indexPath, "utf8");
   let html = source.replace(
@@ -84,8 +84,18 @@ async function createIndexHtml(manifestFileName) {
 
   html = html.replace(
     /new URL\("(?:__MANIFEST_FILE__|manifest(?:\.[a-f0-9]+)?\.plist)", window\.location\.href\)\.href/g,
-    `new URL("${manifestFileName}", window.location.href).href`
+    `new URL("${assetPrefix}${manifestFileName}", window.location.href).href`
   );
+
+  if (assetPrefix) {
+    html = html.replaceAll('href="favicon.ico"', `href="${assetPrefix}favicon.ico"`);
+    html = html.replaceAll('href="favicon-32x32.png"', `href="${assetPrefix}favicon-32x32.png"`);
+    html = html.replaceAll('href="favicon-16x16.png"', `href="${assetPrefix}favicon-16x16.png"`);
+    html = html.replaceAll('href="apple-touch-icon.png"', `href="${assetPrefix}apple-touch-icon.png"`);
+    html = html.replaceAll('href="site.webmanifest"', `href="${assetPrefix}site.webmanifest"`);
+    html = html.replaceAll('src="logo.png"', `src="${assetPrefix}logo.png"`);
+    html = html.replaceAll('src="qrcode.png"', `src="${assetPrefix}qrcode.png"`);
+  }
 
   if (!html.includes(manifestFileName)) {
     throw new Error("Build failed: index.html does not reference the hashed manifest file.");
@@ -150,7 +160,7 @@ function joinUrl(base, value) {
   return `${base.replace(/\/+$/, "")}/${value.replace(/^\/+/, "")}`;
 }
 
-function normalizeHttpsBase(value, name) {
+function normalizeHttpsUrl(value, name) {
   const trimmed = value.trim();
   if (trimmed === "") {
     throw new Error(`${name} cannot be empty.`);
@@ -169,7 +179,7 @@ function normalizeHttpsBase(value, name) {
     throw new Error(`${name} must be an HTTPS URL.`);
   }
 
-  return parsed.href.replace(/\/+$/, "");
+  return parsed.href;
 }
 
 function requireString(value, name) {
