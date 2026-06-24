@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="format-detection" content="telephone=no" />
+    <title>PurrlyAI 安装</title>
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f7fb;
+        --panel: #ffffff;
+        --ink: #16181d;
+        --muted: #667085;
+        --line: #dde3ee;
+        --primary: #1663ff;
+        --primary-dark: #0d4ed6;
+        --success: #12805c;
+        --warn-bg: #fff7df;
+        --warn-line: #efd17b;
+        --shadow: 0 18px 48px rgba(36, 48, 76, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+          "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+        background:
+          radial-gradient(circle at 20% 0%, rgba(22, 99, 255, 0.12), transparent 28rem),
+          linear-gradient(180deg, #fbfcff 0%, var(--bg) 52%, #eef2f8 100%);
+        color: var(--ink);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .page {
+        width: min(960px, 100%);
+        margin: 0 auto;
+        padding: max(24px, env(safe-area-inset-top)) 18px 40px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 180px;
+        gap: 28px;
+        align-items: center;
+        padding: 38px 0 24px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+        color: var(--success);
+        font-size: 14px;
+        font-weight: 700;
+      }
+
+      .status-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: var(--success);
+        box-shadow: 0 0 0 5px rgba(18, 128, 92, 0.12);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(34px, 7vw, 60px);
+        line-height: 1.04;
+        letter-spacing: 0;
+      }
+
+      .lead {
+        max-width: 620px;
+        margin: 18px 0 0;
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.8;
+      }
+
+      .app-icon {
+        width: 164px;
+        height: 164px;
+        aspect-ratio: 1;
+        border-radius: 32px;
+        display: block;
+        justify-self: end;
+        object-fit: cover;
+        box-shadow: var(--shadow);
+      }
+
+      .install-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        padding: 18px;
+      }
+
+      .install-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .install-title {
+        margin: 0 0 6px;
+        font-size: 20px;
+      }
+
+      .version-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px 3px;
+        border: 1px solid rgba(102, 112, 133, 0.24);
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.7);
+        color: var(--muted);
+        font-size: clamp(11px, 1.8vw, 13px);
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: 0;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+        vertical-align: middle;
+        margin-left: 10px;
+        position: relative;
+        top: -0.45em;
+      }
+
+      .install-meta {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.6;
+        word-break: break-word;
+      }
+
+      .install-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 52px;
+        min-width: 150px;
+        padding: 0 22px;
+        border-radius: 8px;
+        background: var(--primary);
+        color: #fff;
+        font-size: 17px;
+        font-weight: 800;
+        text-decoration: none;
+        box-shadow: 0 10px 22px rgba(22, 99, 255, 0.24);
+        transition:
+          transform 150ms ease,
+          background 150ms ease;
+      }
+
+      .install-button:active {
+        transform: translateY(1px);
+        background: var(--primary-dark);
+      }
+
+      .notice {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border: 1px solid var(--warn-line);
+        border-radius: 8px;
+        background: var(--warn-bg);
+        color: #6e5200;
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .qr-panel {
+        display: none;
+        place-items: center;
+        gap: 12px;
+        text-align: center;
+      }
+
+      .qr-card {
+        width: 220px;
+        height: 220px;
+        padding: 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      .qr-code {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .qr-title {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 800;
+      }
+
+      .qr-meta {
+        max-width: 420px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .install-panel.is-desktop .install-row,
+      .install-panel.is-desktop .browser-notice {
+        display: none;
+      }
+
+      .install-panel.is-desktop .old-version-notice {
+        margin: 0 0 14px;
+      }
+
+      .install-panel.is-desktop .qr-panel {
+        display: grid;
+      }
+
+      .sections {
+        margin-top: 16px;
+      }
+
+      .section {
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 18px;
+      }
+
+      .section h2 {
+        margin: 0 0 14px;
+        font-size: 18px;
+      }
+
+      .steps {
+        display: grid;
+        gap: 12px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .step {
+        display: grid;
+        grid-template-columns: 30px minmax(0, 1fr);
+        gap: 10px;
+        align-items: start;
+      }
+
+      .step-number {
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        background: #edf3ff;
+        color: var(--primary);
+        font-size: 14px;
+        font-weight: 800;
+      }
+
+      .step strong {
+        display: block;
+        margin-bottom: 3px;
+        font-size: 15px;
+      }
+
+      .step span {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.55;
+      }
+
+      .support-link {
+        display: inline-flex;
+        margin-top: 16px;
+        color: var(--primary);
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      .support-link:active {
+        color: var(--primary-dark);
+      }
+
+      .footer {
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.6;
+        text-align: center;
+      }
+
+      @media (max-width: 760px) {
+        .hero {
+          grid-template-columns: minmax(0, 1fr) 76px;
+          gap: 12px 14px;
+          padding: 20px 0 18px;
+          align-items: center;
+        }
+
+        .hero-copy {
+          display: contents;
+        }
+
+        .eyebrow {
+          grid-column: 1;
+          grid-row: 1;
+          margin-bottom: 8px;
+        }
+
+        h1 {
+          grid-column: 1;
+          grid-row: 2;
+        }
+
+        .version-badge {
+          margin-left: 8px;
+          padding-inline: 8px;
+          top: -0.4em;
+        }
+
+        .lead {
+          grid-column: 1 / -1;
+          grid-row: 3;
+          max-width: none;
+          margin-top: 2px;
+          font-size: 15px;
+          line-height: 1.7;
+        }
+
+        .app-icon {
+          grid-column: 2;
+          grid-row: 1 / span 2;
+          width: 76px;
+          height: 76px;
+          border-radius: 18px;
+          justify-self: end;
+        }
+
+        .install-row {
+          grid-template-columns: 1fr;
+        }
+
+        .install-button {
+          width: 100%;
+        }
+      }
+
+      @media (max-width: 360px) {
+        .version-badge {
+          display: flex;
+          width: max-content;
+          margin: 7px 0 0;
+          top: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="status-dot"></span><span data-i18n="eyebrow">iOS 安装</span></div>
+          <h1 id="page-title">PurrlyAI<span class="version-badge">v1.10.2</span></h1>
+          <p class="lead" data-i18n="lead">
+            请使用 iPhone 或 iPad 的 Safari 打开本页面。点击安装后，系统会请求确认并在桌面创建应用图标。
+          </p>
+        </div>
+        <img class="app-icon" src="https://purrly.ai/logo.png" alt="PurrlyAI" />
+      </section>
+
+      <section class="install-panel" id="install-panel" aria-labelledby="install-title">
+        <div class="install-row">
+          <div>
+            <h2 class="install-title" id="install-title" data-i18n="installTitle">安装到 iOS 设备</h2>
+            <p class="install-meta" data-i18n="installMeta">
+              点击按钮后，系统会打开安装确认窗口。
+            </p>
+          </div>
+          <a class="install-button" id="install-link" href="#" data-i18n="installButton">点击安装</a>
+        </div>
+        <div class="notice old-version-notice" data-i18n="oldVersionNotice">
+          如果已安装老版本，建议先卸载旧版后再安装，避免安装失败或启动异常。
+        </div>
+        <div class="notice browser-notice" id="browser-notice" data-i18n="defaultNotice">
+          如果你正在微信、QQ、钉钉或其他内置浏览器中访问，请复制链接到 Safari 后再安装。
+        </div>
+        <div class="qr-panel" id="qr-panel" aria-live="polite">
+          <div class="qr-card">
+            <img class="qr-code" id="qr-code" src="/qrcode.png" alt="" width="200" height="200" />
+          </div>
+          <p class="qr-title" data-i18n="desktopTitle">请用手机相机扫码</p>
+          <p class="qr-meta" data-i18n="desktopMeta">在 iPhone 或 iPad 上打开扫码结果后，使用 Safari 继续安装。</p>
+        </div>
+      </section>
+
+      <div class="sections">
+        <section class="section" aria-labelledby="steps-title">
+          <h2 id="steps-title" data-i18n="stepsTitle">安装流程</h2>
+          <ol class="steps">
+            <li class="step">
+              <span class="step-number">1</span>
+              <span><strong data-i18n="step1Title">点击安装</strong><span data-i18n="step1Body">在系统弹窗中确认安装，返回桌面等待下载完成。</span></span>
+            </li>
+            <li class="step">
+              <span class="step-number">2</span>
+              <span><strong data-i18n="step2Title">信任企业证书</strong><span data-i18n="step2Body">打开设置 → 通用 → VPN 与设备管理，选择企业名称并点击信任。</span></span>
+            </li>
+            <li class="step">
+              <span class="step-number">3</span>
+              <span><strong data-i18n="step3Title">回到桌面打开</strong><span data-i18n="step3Body">完成信任后再次点击应用图标，即可正常启动。</span></span>
+            </li>
+          </ol>
+          <a
+            class="support-link"
+            href="https://support.apple.com/118254"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-i18n="appleSupport"
+          >查看 Apple 官方说明</a>
+        </section>
+      </div>
+
+      <p class="footer" data-i18n="footer">请从 PurrlyAI 官方发布链接下载安装。</p>
+    </main>
+
+    <script>
+      const translations = {
+        zh: {
+          htmlLang: "zh-CN",
+          title: "PurrlyAI 安装",
+          eyebrow: "iOS 安装",
+          lead: "请使用 iPhone 或 iPad 的 Safari 打开本页面。点击安装后，系统会请求确认并在桌面创建应用图标。",
+          installTitle: "安装到 iOS 设备",
+          installMeta: "点击按钮后，系统会打开安装确认窗口。",
+          installButton: "点击安装",
+          oldVersionNotice: "如果已安装老版本，建议先卸载旧版后再安装，避免安装失败或启动异常。",
+          defaultNotice: "如果你正在微信、QQ、钉钉或其他内置浏览器中访问，请复制链接到 Safari 后再安装。",
+          desktopTitle: "请用手机相机扫码",
+          desktopMeta: "在 iPhone 或 iPad 上打开扫码结果后，使用 Safari 继续安装。",
+          qrAlt: "PurrlyAI 安装页二维码",
+          stepsTitle: "安装流程",
+          step1Title: "点击安装",
+          step1Body: "在系统弹窗中确认安装，返回桌面等待下载完成。",
+          step2Title: "信任企业证书",
+          step2Body: "打开设置 → 通用 → VPN 与设备管理，选择企业名称并点击信任。",
+          step3Title: "回到桌面打开",
+          step3Body: "完成信任后再次点击应用图标，即可正常启动。",
+          appleSupport: "查看 Apple 官方说明",
+          footer: "请从 PurrlyAI 官方发布链接下载安装。",
+          notIOS: "当前设备可能不是 iPhone 或 iPad。请把本页面链接发送到 iOS 设备，并用 Safari 打开。",
+          notSafari: "当前浏览器可能无法唤起 iOS 安装。请点击右上角菜单，选择在 Safari 中打开。",
+        },
+        zh_Hant: {
+          htmlLang: "zh-Hant-TW",
+          title: "PurrlyAI 安裝",
+          eyebrow: "iOS 安裝",
+          lead: "請使用 iPhone 或 iPad 的 Safari 開啟本頁面。點擊安裝後，系統會要求確認並在主畫面建立 App 圖示。",
+          installTitle: "安裝到 iOS 裝置",
+          installMeta: "點擊按鈕後，系統會開啟安裝確認視窗。",
+          installButton: "點擊安裝",
+          oldVersionNotice: "如果已安裝舊版本，建議先卸載舊版後再安裝，避免安裝失敗或啟動異常。",
+          defaultNotice: "如果你正在微信、QQ、釘釘或其他內建瀏覽器中瀏覽，請複製連結到 Safari 後再安裝。",
+          desktopTitle: "請用手機相機掃碼",
+          desktopMeta: "在 iPhone 或 iPad 上開啟掃碼結果後，使用 Safari 繼續安裝。",
+          qrAlt: "PurrlyAI 安裝頁 QR Code",
+          stepsTitle: "安裝流程",
+          step1Title: "點擊安裝",
+          step1Body: "在系統彈窗中確認安裝，返回主畫面等待下載完成。",
+          step2Title: "信任企業憑證",
+          step2Body: "開啟設定 → 一般 → VPN 與裝置管理，選擇企業名稱並點擊信任。",
+          step3Title: "回到主畫面開啟",
+          step3Body: "完成信任後再次點擊 App 圖示，即可正常啟動。",
+          appleSupport: "查看 Apple 官方說明",
+          footer: "請從 PurrlyAI 官方發布連結下載安裝。",
+          notIOS: "目前裝置可能不是 iPhone 或 iPad。請將本頁面連結傳送到 iOS 裝置，並用 Safari 開啟。",
+          notSafari: "目前瀏覽器可能無法喚起 iOS 安裝。請點擊右上角選單，選擇在 Safari 中開啟。",
+        },
+        en: {
+          htmlLang: "en",
+          title: "Install PurrlyAI",
+          eyebrow: "iOS Install",
+          lead: "Open this page in Safari on your iPhone or iPad. After you tap install, iOS will ask for confirmation and create the app icon on your Home Screen.",
+          installTitle: "Install on iOS",
+          installMeta: "Tap the button to open the iOS installation confirmation.",
+          installButton: "Install",
+          oldVersionNotice: "If an older version is already installed, uninstall it first before installing this version to avoid install or launch issues.",
+          defaultNotice: "If you are viewing this page in WeChat, QQ, DingTalk, or another in-app browser, copy the link and open it in Safari before installing.",
+          desktopTitle: "Scan with your phone camera",
+          desktopMeta: "Open the scanned link on your iPhone or iPad, then continue in Safari to install.",
+          qrAlt: "QR code for the PurrlyAI install page",
+          stepsTitle: "Installation Steps",
+          step1Title: "Tap Install",
+          step1Body: "Confirm the installation in the system prompt, then return to the Home Screen and wait for the download to finish.",
+          step2Title: "Trust the certificate",
+          step2Body: "Open Settings → General → VPN & Device Management, select the enterprise name, then tap Trust.",
+          step3Title: "Open from Home Screen",
+          step3Body: "After trusting the certificate, tap the app icon again to launch it.",
+          appleSupport: "View Apple's official instructions",
+          footer: "Download and install from the official PurrlyAI release link.",
+          notIOS: "This device may not be an iPhone or iPad. Send this page link to an iOS device and open it in Safari.",
+          notSafari: "This browser may not be able to start iOS installation. Open the menu and choose Safari.",
+        },
+        jp: {
+          htmlLang: "ja",
+          title: "PurrlyAI をインストール",
+          eyebrow: "iOS インストール",
+          lead: "このページを iPhone または iPad の Safari で開いてください。インストールをタップすると、iOS が確認を求め、ホーム画面にアプリアイコンを作成します。",
+          installTitle: "iOS デバイスにインストール",
+          installMeta: "ボタンをタップすると、iOS のインストール確認画面が開きます。",
+          installButton: "インストール",
+          oldVersionNotice: "古いバージョンがインストール済みの場合は、インストールや起動の問題を避けるため、先に旧版をアンインストールしてからインストールしてください。",
+          defaultNotice: "WeChat、QQ、DingTalk、またはその他のアプリ内ブラウザでこのページを開いている場合は、リンクをコピーして Safari で開いてからインストールしてください。",
+          desktopTitle: "スマートフォンのカメラでスキャン",
+          desktopMeta: "iPhone または iPad でスキャンしたリンクを開き、Safari でインストールを続けてください。",
+          qrAlt: "PurrlyAI インストールページの QR コード",
+          stepsTitle: "インストール手順",
+          step1Title: "インストールをタップ",
+          step1Body: "システムの確認画面でインストールを承認し、ホーム画面に戻ってダウンロードの完了を待ちます。",
+          step2Title: "企業証明書を信頼",
+          step2Body: "設定 → 一般 → VPN とデバイス管理を開き、企業名を選択して信頼をタップします。",
+          step3Title: "ホーム画面から開く",
+          step3Body: "証明書を信頼した後、アプリアイコンをもう一度タップすると起動できます。",
+          appleSupport: "Apple 公式の手順を見る",
+          footer: "PurrlyAI 公式リリースリンクからダウンロードしてインストールしてください。",
+          notIOS: "現在のデバイスは iPhone または iPad ではない可能性があります。このページのリンクを iOS デバイスに送り、Safari で開いてください。",
+          notSafari: "現在のブラウザでは iOS インストールを開始できない可能性があります。メニューを開き、Safari で開いてください。",
+        },
+      };
+
+      function normalizeLang(value) {
+        if (!value) return "";
+        const normalized = value.replace(/-/g, "_");
+        const lower = normalized.toLowerCase();
+
+        if (lower === "zh_hant" || lower.startsWith("zh_hant_")) return "zh_Hant";
+        if (["zh_tw", "zh_hk", "zh_mo"].some((prefix) => lower === prefix || lower.startsWith(`${prefix}_`))) {
+          return "zh_Hant";
+        }
+        if (lower === "zh" || lower === "zh_hans" || lower.startsWith("zh_hans_")) return "zh";
+        if (["zh_cn", "zh_sg"].some((prefix) => lower === prefix || lower.startsWith(`${prefix}_`))) return "zh";
+        if (lower === "en" || lower.startsWith("en_")) return "en";
+        if (lower === "jp" || lower === "ja" || lower.startsWith("ja_")) return "jp";
+        return "";
+      }
+
+      function detectLang() {
+        const queryLang = normalizeLang(new URLSearchParams(window.location.search).get("lang"));
+        if (queryLang) return queryLang;
+
+        for (const language of navigator.languages || [navigator.language]) {
+          const detected = normalizeLang(language);
+          if (detected) return detected;
+        }
+
+        return "en";
+      }
+
+      const lang = detectLang();
+      const text = translations[lang] || translations.en;
+
+      document.documentElement.lang = text.htmlLang;
+      document.title = text.title;
+      document.querySelectorAll("[data-i18n]").forEach((element) => {
+        const key = element.dataset.i18n;
+        element.textContent = text[key];
+      });
+
+      const manifestUrl = "https://ios-install.purrly.ai/manifest.plist";
+      const installUrl = `itms-services://?action=download-manifest&url=${encodeURIComponent(manifestUrl)}`;
+      const link = document.getElementById("install-link");
+      const installPanel = document.getElementById("install-panel");
+      const notice = document.getElementById("browser-notice");
+      const qrCode = document.getElementById("qr-code");
+
+      link.href = installUrl;
+      qrCode.alt = text.qrAlt;
+
+      const ua = navigator.userAgent || "";
+      const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      const isMobileWeb = /Android|Mobile|Windows Phone|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+      const isSafari = /^((?!chrome|android|crios|fxios|micromessenger|qq|dingtalk).)*safari/i.test(ua);
+
+      if (!isIOS && !isMobileWeb) {
+        installPanel.classList.add("is-desktop");
+      } else if (!isIOS) {
+        notice.textContent = text.notIOS;
+      } else if (!isSafari) {
+        notice.textContent = text.notSafari;
+      }
+    </script>
+  </body>
+</html>
