@@ -1,7 +1,7 @@
 {
   "scripts": {
     "build": "npm run build:github",
-    "build:github": "DOMAIN=https://aisese365.github.io/ios-install/ DOWNLOAD_URL=https://github.com/aisese365/aisese365.github.io/releases/download/v{version}/aisese-ios-{version}.ipa node scripts/build.mjs",
+    "build:github": "DOMAIN=https://aisese365.github.io/ios-install/ DOWNLOAD_URL=https://github.com/aisese365/aisese365.github.io/releases/download/{version}/aisese-ios-{version}.ipa node scripts/build.mjs",
     "build:cf": "DOMAIN=https://aisese365-ios-install.pages.dev/ DOWNLOAD_URL=https://pub-9f9a433bef504b16b1b30cd09cc00b91.r2.dev/aisese-ios-{version}.ipa node scripts/build.mjs"
   }
 }
